@@ -1,5 +1,6 @@
 @extends('layout.app')
-@section('content')    
+@section('content')
+    
     <a href="/income" class="btn btn-default"><< Back</a>
     <h1>Income</h1>
     {!! Form::open(['action' => 'IncomeController@store','method'=>'POST']) !!}

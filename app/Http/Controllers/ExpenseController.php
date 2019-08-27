@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
+use App\Expensive;
 use App\Income;
 use App\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class IncomeController extends Controller
+class ExpenseController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -25,17 +28,22 @@ class IncomeController extends Controller
      */
     public function index()
     {
-        if(Auth::check()){
-            $incomes = Income::orderBy('created_at','desc')->where('user_id','=',auth()->user()->id)->get();
-        } else {
-            $incomes = Income::orderBy('created_at','desc')->get();
+        if (Auth::check()) {
+            $expensives = Expensive::orderBy('created_at','desc')->where('user_id','=',auth()->user()->id)->get();
+            $amount = $expensives->sum('amount');       
         }
-        
-        foreach ($incomes as $income) {
-            $user = User::where('id',$income->user_id)->get();
-            $income->created_by = $user->count()>0?$user[0]->name:'Anonymouse';
+        else {
+            $expensives = Expensive::orderBy('created_at','desc')->get();
+            $amount = $expensives->sum('amount');
         }
-        return view('income/index')->with('incomes',$incomes);
+
+        foreach ($expensives as $item) {
+            $user = User::where('id',$item->user_id)->get();
+            $item->created_by = $user->count()>0?$user[0]->name:'Anonymouse';
+        }
+
+        return view('expense/index')->with('expensives',$expensives)->with('amount',$amount);
+       
     }
 
     /**
@@ -45,7 +53,7 @@ class IncomeController extends Controller
      */
     public function create()
     {
-       return view('income/create');
+        return view('expense/create');
     }
 
     /**
@@ -56,19 +64,29 @@ class IncomeController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
-            'category'=>'required|not_in:0',
-            'value'=>'required'
-        ]);
+        // DB::transaction(function () {
+        //     try {
+            
+            //$income_amount=  Income::where('user_id','=',1)->sum('amount');
+            
+                $this->validate($request,[
+                    'amount'=>'required',
+                    'detail'=>'required'
+                ]);
         
-        //return $validate;
-        $income = new Income();
-        $income->category = $request->category;
-        $income->amount = $request->value;
-        $income->user_id= auth()->user()->id;
-        $income->save();
-
-        return redirect('/income')->with('success','Post Created');
+                $expense = new Expensive();
+                $expense->amount = $request->amount;
+                $expense->detail = $request->detail;
+                $expense->user_id = auth()->user()->id;
+                $expense->save();
+    
+                return redirect('/expense')->with('success','Expensive created');
+            // } catch (\Throwable $th) {
+            //     throw $th;
+            //     //Db:roll
+            // }
+        // });
+        
     }
 
     /**
@@ -90,8 +108,8 @@ class IncomeController extends Controller
      */
     public function edit($id)
     {
-        $income = Income::find($id);
-        return view('income/edit')->with('income',$income);
+        $expense = Expensive::find($id);
+        return view('expense\edit')->with('expense',$expense);
     }
 
     /**
@@ -103,11 +121,7 @@ class IncomeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $income = Income::find($id);
-        $income->category = $request->input('category');
-        $income->amount = $request->input('value');
-        $income->save();
-        return redirect('/income')->with('success','Income Updated');
+        //
     }
 
     /**
@@ -118,8 +132,6 @@ class IncomeController extends Controller
      */
     public function destroy($id)
     {
-        $income = Income::find($id);
-        $income->delete();
-        return redirect('/income')->with('Success','Icome Deleted');
+        //
     }
 }
