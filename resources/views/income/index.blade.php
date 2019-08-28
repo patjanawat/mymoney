@@ -1,7 +1,9 @@
 @extends('layout.app')
 @section('content')    
     <div class="col-md-6 offset-md-3">
+        @if(!Auth::guest())
         <a href="/income/create" class="btn btn-primary">New</a>
+        @endif
         <ul class="list-group margin-top-15">
             @foreach ($incomes as $income)            
                 {!! Form::open(['action'=>['IncomeController@destroy',$income->id],'method'=>'DELETE']) !!}            
