@@ -33,8 +33,12 @@ class IncomeController extends Controller
         
         foreach ($incomes as $income) {
             $user = User::where('id',$income->user_id)->get();
+            $income->category_type = $income->category==1?"Salary":"Sell";
             $income->created_by = $user->count()>0?$user[0]->name:'Anonymouse';
         }
+
+        //return $incomes;
+
         return view('income/index')->with('incomes',$incomes);
     }
 

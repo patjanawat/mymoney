@@ -9,11 +9,33 @@
 <body>
     <div id="app">
         @include('common.nav')
-        <div class="container">
+        <div class="container-fluid margin-top-15">
             @include('common.message')
             @yield('content')
         </div>
     </div>
+    <style>
+        .margin-top-15 {
+            margin-top: 15px;
+        }
+        .font-weight-700 {
+            font-weight: 700;
+        }
+
+        .moeny-outcome{
+        color: red;
+      }
+      .money-net{
+        border-bottom: none;
+        font-weight: 700;
+        color: green;
+        background-color: #eee;
+      }
+
+      .card-header {
+        border-bottom:0px;
+      }
+    </style>
     <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>
